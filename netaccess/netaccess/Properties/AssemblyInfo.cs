@@ -10,7 +10,7 @@ using System.Windows;
 [assembly: AssemblyTitle("netaccess")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("Karthik Nishanth")]
 [assembly: AssemblyProduct("netaccess")]
 [assembly: AssemblyCopyright("Copyright ©  2015")]
 [assembly: AssemblyTrademark("")]

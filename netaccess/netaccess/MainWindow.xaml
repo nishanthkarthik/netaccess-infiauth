@@ -1,7 +1,10 @@
 ﻿<Window x:Class="netaccess.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="netaccess" Height="350" Width="525" ResizeMode="CanMinimize">
+        Title="netaccess" Height="350" Width="525" ResizeMode="CanMinimize" UseLayoutRounding="True">
+    <Window.Icon>
+        <BitmapImage RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" UriSource="Signal.ico"/>
+    </Window.Icon>
     <Window.Resources>
         <Style x:Key="ButtonStyle" TargetType="Button">
             <Setter Property="FontFamily" Value="Segoe UI"/>
