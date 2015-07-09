@@ -1,52 +1,39 @@
 ﻿<Window x:Class="netaccess.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="netaccess" Height="350" Width="525" ResizeMode="CanMinimize" UseLayoutRounding="True">
+        xmlns:modernWpf="http://modernwpf"
+        Title="NETACCESS" Height="250" Width="450" UseLayoutRounding="True"
+        Style="{StaticResource ModernWindow}">
+
     <Window.Icon>
         <BitmapImage RenderOptions.BitmapScalingMode="NearestNeighbor" RenderOptions.EdgeMode="Aliased" UriSource="Signal.ico"/>
     </Window.Icon>
+    
     <Window.Resources>
-        <Style x:Key="ButtonStyle" TargetType="Button">
-            <Setter Property="FontFamily" Value="Segoe UI"/>
-            <Setter Property="FontSize" Value="24"/>
-            <Setter Property="Height" Value="40"/>
-            <Setter Property="Width" Value="250"/>
-        </Style>
-        <Style x:Key="TextBoxStyle" TargetType="TextBox">
-            <Setter Property="FontFamily" Value="Segoe UI Light"/>
-            <Setter Property="FontSize" Value="28"/>
-            <Setter Property="Height" Value="40"/>
-            <Setter Property="Width" Value="150"/>
-            <Setter Property="TextAlignment" Value="Center"/>
-        </Style>
-        <Style x:Key="TextBlockStyle" TargetType="TextBlock">
-            <Setter Property="FontFamily" Value="Segoe UI Light"/>
-            <Setter Property="FontSize" Value="28"/>
-            <Setter Property="Height" Value="40"/>
-            <Setter Property="Width" Value="150"/>
-            <Setter Property="TextAlignment" Value="Center"/>
-        </Style>
-        <Style x:Key="PasswordStyle" TargetType="PasswordBox">
-            <Setter Property="FontFamily" Value="Segoe UI Light"/>
-            <Setter Property="FontSize" Value="28"/>
-            <Setter Property="Height" Value="40"/>
-            <Setter Property="Width" Value="150"/>
-            <Setter Property="HorizontalContentAlignment" Value="Center"/>
-        </Style>
-        <Storyboard x:Key="ShowCredPanelKey">
-            <DoubleAnimation Storyboard.TargetName="CredentialsPanel" Storyboard.TargetProperty="MaxHeight" From="0" To="{Binding ElementName=CredentialsPanel, Path=ActualHeight}" DesiredFrameRate="60" Duration="0:0:0.75"/>
-            <DoubleAnimation Storyboard.TargetName="ConfigPanel" Storyboard.TargetProperty="MaxHeight" From="{Binding ElementName=CredentialsPanel, Path=ActualHeight}" To="0" DesiredFrameRate="60" Duration="0:0:0.75"/>
-        </Storyboard>
-        <Storyboard x:Key="HideCredPanelKey">
-            <DoubleAnimation Storyboard.TargetName="CredentialsPanel" Storyboard.TargetProperty="MaxHeight" To="0" From="{Binding ElementName=CredentialsPanel, Path=ActualHeight}" DesiredFrameRate="60" Duration="0:0:0.75"/>
-            <DoubleAnimation Storyboard.TargetName="ConfigPanel" Storyboard.TargetProperty="MaxHeight" To="{Binding ElementName=CredentialsPanel, Path=ActualHeight}" From="0" DesiredFrameRate="60" Duration="0:0:0.75"/>
-        </Storyboard>
     </Window.Resources>
 
     <Grid>
-        <StackPanel VerticalAlignment="Center">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Column="0" MinWidth="150" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBox x:Name="UsernameBox" Margin="2.5" modernWpf:TextBoxUI.WatermarkText="roll no."/>
+            <PasswordBox x:Name="PasswordBox" Margin="2.5" modernWpf:TextBoxUI.WatermarkText="password"/>
+            <Button x:Name="CredentialButton" Margin="5" Click="CredentialButton_OnClick" Content="Login" />
+            <TextBlock x:Name="StatusBlock" FontFamily="Segoe UI Light" HorizontalAlignment="Center" Text="ready"></TextBlock>
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" MinWidth="150" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock Text="time interval (seconds)" FontSize="14"/>
+            <TextBox x:Name="IntervalBox" modernWpf:TextBoxUI.WatermarkText="interval" Margin="2.5" Text="30"/>
+            <Button x:Name="StartButton" Click="StartButton_OnClick" Content="Start Timer"/>
+            <Button x:Name="StopButton" Click="StopButton_OnClick" Content="Stop Timer"/>
+        </StackPanel>
+
+        <!--<StackPanel VerticalAlignment="Center">
             <Button x:Name="CredentialButton" Style="{StaticResource ButtonStyle}" Content="Enter credentials" Click="CredentialButton_OnClick"/>
-           
+
             <StackPanel x:Name="CredentialsPanel">
                 <StackPanel Margin="0,20,0,10" Orientation="Horizontal" HorizontalAlignment="Center">
                     <TextBox x:Name="UsernameBox" ToolTip="Roll number" Margin="0,0,20,0" MouseEnter="UsernameBox_OnMouseEnter" MouseLeave="UsernameBox_OnMouseLeave" Style="{StaticResource TextBoxStyle}" Text="roll no."/>
@@ -64,6 +51,6 @@
                     <Button x:Name="StopButton" Content="Stop Timer" Width="150" Margin="0,0,20,0" Click="StopButton_OnClick" Style="{StaticResource ButtonStyle}"/>
                 </StackPanel>
             </StackPanel>
-        </StackPanel>
+        </StackPanel>-->
     </Grid>
 </Window>

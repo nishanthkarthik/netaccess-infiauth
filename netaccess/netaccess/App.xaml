@@ -1,8 +1,23 @@
 ﻿<Application x:Class="netaccess.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:modern="http://modernwpf"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+
+                <!--add these 3 if you want to explicitly refer to any of the Modern* styles for a control --><!--
+                <ResourceDictionary Source="/ModernWPF;component/Themes/ModernBase.xaml" />
+                <ResourceDictionary Source="/ModernWPF;component/Themes/ModernLight.xaml" />
+                <ResourceDictionary Source="/ModernWPF;component/Themes/ModernStylesExplicit.xaml" />-->
+
+
+                <!--add these 3 if you want to have common controls use the modern styles by default -->
+                <ResourceDictionary Source="/ModernWPF;component/Themes/ModernBase.xaml" />
+                <ResourceDictionary Source="/ModernWPF;component/Themes/ModernLight.xaml" />
+                <ResourceDictionary Source="/ModernWPF;component/Themes/ModernStyles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

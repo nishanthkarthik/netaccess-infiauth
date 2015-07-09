@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
-using System.Windows;
 using RestSharp;
 
 namespace netaccess
@@ -10,7 +10,8 @@ namespace netaccess
     {
         private string Username { get; set; }
         private string Password { get; set; }
-        private bool IsAuthValid { get; set; }
+        public bool IsAuthValid { get; set; }
+        public bool IsConnected;
 
         public void AddCredentials(string username, string password)
         {
@@ -25,6 +26,7 @@ namespace netaccess
                 IsAuthValid = false;
                 IList<RestResponseCookie> cookies = RetrieveCookie();
                 AuthSession(Username, Password, cookies);
+                IsConnected = true;
                 if (!IsAuthValid)
                     return IsAuthValid;
                 AuthUsage(cookies, false);
@@ -32,7 +34,8 @@ namespace netaccess
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.Message);
+                IsConnected = false;
+                Debug.WriteLine(exception.Message);
                 return false;
             }
         }
@@ -61,7 +64,7 @@ namespace netaccess
             if (credentialResponse.ResponseUri.AbsoluteUri == @"https://netaccess.iitm.ac.in/account/login")
             {
                 IsAuthValid = false;
-                MessageBox.Show(@"Wrong username-password combination. Try again!");
+                Debug.WriteLine(@"Wrong username-password combination. Try again!");
             }
         }
 

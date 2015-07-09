@@ -1,21 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Speech.Synthesis;
-using System.Text;
-using System.Threading.Tasks;
+using System.Globalization;
+using System.Media;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
+using Microsoft.ApplicationInsights;
+using ModernWPF;
 
 namespace netaccess
 {
@@ -24,82 +16,106 @@ namespace netaccess
     /// </summary>
     public partial class MainWindow : Window
     {
-        public Storyboard ShowCredPanelKey { get; private set; }
-        public Storyboard HideCredPanelKey { get; private set; }
         private LibNetAccess _netAccess;
         private DispatcherTimer _timer;
+        private readonly TelemetryClient _telemetry = new TelemetryClient();
+        private Stopwatch _stopwatch;
+        private DateTime _time;
 
         public MainWindow()
         {
             InitializeComponent();
             Loaded += MainWindow_Loaded;
+            _telemetry.InstrumentationKey = "1d0ad5f2-7647-4016-926a-edce544b11c8";
+            Closing += MainWindow_Closing;
+            Activated += MainWindow_Activated;
+            Deactivated += MainWindow_Deactivated;
+
+            // Set session data:
+            _telemetry.Context.User.Id = Environment.UserName;
+            _telemetry.Context.Session.Id = Guid.NewGuid().ToString();
+            _telemetry.Context.Device.Language = CultureInfo.InstalledUICulture.EnglishName;
+            _telemetry.Context.Device.OperatingSystem = Environment.OSVersion.ToString();
+
+            // Log a page view:
+            _telemetry.TrackPageView("MainWindow");
+        }
+
+        void MainWindow_Deactivated(object sender, EventArgs e)
+        {
+            if (_stopwatch != null)
+                _telemetry.TrackRequest("WindowActive", _time, _stopwatch.Elapsed, "true", true);
+        }
+
+        void MainWindow_Activated(object sender, EventArgs e)
+        {
+            _telemetry.TrackEvent("MainPageActive");
+            _time = DateTime.Now;
+            _stopwatch = Stopwatch.StartNew();
+        }
+
+        void MainWindow_Closing(object sender, CancelEventArgs e)
+        {
+            if (_telemetry != null)
+            {
+                _telemetry.Flush(); // only for desktop apps
+            }
+            OnClosing(e);
         }
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            ShowCredPanelKey = FindResource("ShowCredPanelKey") as Storyboard;
-            HideCredPanelKey = FindResource("HideCredPanelKey") as Storyboard;
-            if (ShowCredPanelKey != null) ShowCredPanelKey.Begin();
+            ModernTheme.ApplyTheme(ModernTheme.Theme.Dark, Accent.LightBlue);
             _netAccess = new LibNetAccess();
             _timer = new DispatcherTimer();
             _timer.Tick += _timer_Tick;
-            StopButton.IsEnabled = false;
+            StopButton.IsEnabled = StartButton.IsEnabled = IntervalBox.IsEnabled = false;
         }
 
         void _timer_Tick(object sender, EventArgs e)
         {
-            SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer();
-            speechSynthesizer.SelectVoiceByHints(VoiceGender.Female, VoiceAge.Adult);
-            speechSynthesizer.SpeakAsync("Authenticating net access");
-            _netAccess.Authenticate();
-            speechSynthesizer.SpeakAsync("complete");
+            if (_netAccess.Authenticate())
+            {
+                StatusBlock.Text = "logged in";
+                SystemSounds.Beep.Play();
+                ModernTheme.ApplyTheme(ModernTheme.Theme.Dark, Accent.Green);
+                _telemetry.TrackEvent("AuthenticatedTick");
+            }
+            else if (!_netAccess.IsConnected)
+            {
+                StatusBlock.Text = "connectivity issue";
+                ModernTheme.ApplyTheme(ModernTheme.Theme.Dark, Accent.Orange);
+                _telemetry.TrackEvent("NetworkIssueTick");
+            }
+            else
+            {
+                StatusBlock.Text = "wrong credentials";
+                ModernTheme.ApplyTheme(ModernTheme.Theme.Dark, Accent.Red);
+                _telemetry.TrackEvent("WrongLoginTick");
+            }
         }
 
         private void CredentialButton_OnClick(object sender, RoutedEventArgs e)
         {
-            ShowCredPanelKey.Begin();
-        }
-
-        private void UsernameBox_OnMouseEnter(object sender, MouseEventArgs e)
-        {
-            if (sender.GetType() == typeof(TextBox))
+            _netAccess.AddCredentials(UsernameBox.Text, PasswordBox.Password);
+            if (_netAccess.Authenticate())
             {
-                if ((String.IsNullOrWhiteSpace(((TextBox)sender).Text)) || ((TextBox)sender).Text == "roll no.")
-                    ((TextBox)sender).Text = "";
+                StartButton.IsEnabled = IntervalBox.IsEnabled = true;
+                StatusBlock.Text = "logged in";
+                ModernTheme.ApplyTheme(ModernTheme.Theme.Dark, Accent.Green);
+                _telemetry.TrackEvent("Authenticated", new Dictionary<string, string>() { { "roll", "valid" } });
             }
-            else if (sender is PasswordBox)
+            else if (!_netAccess.IsConnected)
             {
-                if ((String.IsNullOrWhiteSpace(((PasswordBox)sender).Password)) || ((PasswordBox)sender).Password == "xxxxxx")
-                    ((PasswordBox)sender).Password = "";
+                StatusBlock.Text = "connectivity issue";
+                ModernTheme.ApplyTheme(ModernTheme.Theme.Dark, Accent.Orange);
+                _telemetry.TrackEvent("NetworkIssue");
             }
-
-        }
-
-        private void UsernameBox_OnMouseLeave(object sender, MouseEventArgs e)
-        {
-            if (sender.GetType() == typeof(TextBox))
-            {
-                if (String.IsNullOrWhiteSpace(((TextBox)sender).Text))
-                    ((TextBox)sender).Text = "roll no.";
-            }
-            else if (sender is PasswordBox)
-            {
-                if (String.IsNullOrWhiteSpace(((PasswordBox)sender).Password))
-                    ((PasswordBox)sender).Password = "xxxxxx";
-            }
-        }
-
-        private void CredentialSaveButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (String.IsNullOrWhiteSpace(UsernameBox.Text) || String.IsNullOrWhiteSpace(PasswordBox.Password))
-                MessageBox.Show("Please enter valid roll no. and password to login.", "Invaild details",
-                    MessageBoxButton.OK);
             else
             {
-                _netAccess.AddCredentials(UsernameBox.Text, PasswordBox.Password);
-                if (!_netAccess.Authenticate())
-                    return;
-                HideCredPanelKey.Begin();
+                StatusBlock.Text = "wrong credentials";
+                ModernTheme.ApplyTheme(ModernTheme.Theme.Dark, Accent.Red);
+                _telemetry.TrackEvent("WrongLogin");
             }
         }
 
@@ -116,6 +132,7 @@ namespace netaccess
             catch (Exception exception)
             {
                 MessageBox.Show(exception.Message);
+                _telemetry.TrackException(exception);
             };
         }
 
