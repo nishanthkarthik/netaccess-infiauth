@@ -60,7 +60,6 @@ namespace netaccess
             {
                 _telemetry.Flush(); // only for desktop apps
             }
-            OnClosing(e);
         }
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
