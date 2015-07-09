@@ -2,13 +2,12 @@
     "homepage": "https://github.com/nishanthkarthik/netaccess-infiauth",
     "license": "https://raw.githubusercontent.com/nishanthkarthik/netaccess-infiauth/master/LICENSE",
     "version": "1.0.1",
-    "architecture": 
-    {
-        "32bit|64bit": 
-        {
+    "architecture": {
+        "32bit|64bit": {
             "url": "https://github.com/nishanthkarthik/netaccess-infiauth/releases/download/v1.0.0/Release.zip",
             "hash": "AD25FD7C903566893E1A39C400E92DBFD77F580910EBE078C9F5388961DFDD42"
         }
     },
+    "extract_dir": "netaccess-auth",
     "bin": "netaccess.exe"
 }
