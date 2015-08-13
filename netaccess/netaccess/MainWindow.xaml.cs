@@ -56,10 +56,7 @@ namespace netaccess
 
         void MainWindow_Closing(object sender, CancelEventArgs e)
         {
-            if (_telemetry != null)
-            {
-                _telemetry.Flush(); // only for desktop apps
-            }
+            _telemetry?.Flush(); // only for desktop apps
         }
 
         void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -68,7 +65,7 @@ namespace netaccess
             _netAccess = new LibNetAccess();
             _timer = new DispatcherTimer();
             _timer.Tick += _timer_Tick;
-            StopButton.IsEnabled = StartButton.IsEnabled = IntervalBox.IsEnabled = false;
+            StopButton.IsEnabled = StartButton.IsEnabled = ApproveButton.IsEnabled = IntervalBox.IsEnabled = false;
         }
 
         void _timer_Tick(object sender, EventArgs e)
@@ -99,7 +96,7 @@ namespace netaccess
             _netAccess.AddCredentials(UsernameBox.Text, PasswordBox.Password);
             if (_netAccess.Authenticate())
             {
-                StartButton.IsEnabled = IntervalBox.IsEnabled = true;
+                StartButton.IsEnabled = IntervalBox.IsEnabled = ApproveButton.IsEnabled = true;
                 StatusBlock.Text = "logged in";
                 ModernTheme.ApplyTheme(ModernTheme.Theme.Dark, Accent.Green);
                 _telemetry.TrackEvent("Authenticated", new Dictionary<string, string>() { { "roll", "valid" } });
@@ -141,6 +138,29 @@ namespace netaccess
             StartButton.IsEnabled = true;
             IntervalBox.IsReadOnly = false;
             StopButton.IsEnabled = false;
+        }
+
+        private void ApproveButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (_netAccess.Authenticate())
+            {
+                StatusBlock.Text = "logged in";
+                SystemSounds.Beep.Play();
+                ModernTheme.ApplyTheme(ModernTheme.Theme.Dark, Accent.Green);
+                _telemetry.TrackEvent("Authenticated");
+            }
+            else if (!_netAccess.IsConnected)
+            {
+                StatusBlock.Text = "connectivity issue";
+                ModernTheme.ApplyTheme(ModernTheme.Theme.Dark, Accent.Orange);
+                _telemetry.TrackEvent("NetworkIssue");
+            }
+            else
+            {
+                StatusBlock.Text = "wrong credentials";
+                ModernTheme.ApplyTheme(ModernTheme.Theme.Dark, Accent.Red);
+                _telemetry.TrackEvent("WrongLogin");
+            }
         }
     }
 }

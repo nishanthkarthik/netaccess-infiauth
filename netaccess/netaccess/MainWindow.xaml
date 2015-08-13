@@ -29,6 +29,7 @@
             <TextBox x:Name="IntervalBox" modernWpf:TextBoxUI.WatermarkText="interval" Margin="2.5" Text="30"/>
             <Button x:Name="StartButton" Click="StartButton_OnClick" Content="Start Timer"/>
             <Button x:Name="StopButton" Click="StopButton_OnClick" Content="Stop Timer"/>
+            <Button x:Name="ApproveButton" Click="ApproveButton_OnClick" Content="Approve"/>
         </StackPanel>
 
         <!--<StackPanel VerticalAlignment="Center">
