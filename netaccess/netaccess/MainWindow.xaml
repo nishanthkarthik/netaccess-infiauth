@@ -21,7 +21,8 @@
             <TextBox x:Name="UsernameBox" Margin="2.5" modernWpf:TextBoxUI.WatermarkText="roll no."/>
             <PasswordBox x:Name="PasswordBox" Margin="2.5" modernWpf:TextBoxUI.WatermarkText="password"/>
             <Button x:Name="CredentialButton" Margin="5" Click="CredentialButton_OnClick" Content="Login" />
-            <TextBlock x:Name="StatusBlock" FontFamily="Segoe UI Light" HorizontalAlignment="Center" Text="ready"></TextBlock>
+            <TextBlock x:Name="StatusBlock" FontFamily="Segoe UI Light" HorizontalAlignment="Center" Foreground="LightGray" Text="ready"/>
+            <TextBlock x:Name="DataBlock" Margin="5" FontFamily="Segoe UI Light" HorizontalAlignment="Center" Text="data usage"/>
         </StackPanel>
 
         <StackPanel Grid.Column="1" MinWidth="150" VerticalAlignment="Center" HorizontalAlignment="Center">

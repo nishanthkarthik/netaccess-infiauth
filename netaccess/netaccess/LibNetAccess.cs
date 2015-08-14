@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
+using System.Text.RegularExpressions;
+using HtmlAgilityPack;
 using RestSharp;
 
 namespace netaccess
@@ -12,6 +14,7 @@ namespace netaccess
         private string Password { get; set; }
         public bool IsAuthValid { get; set; }
         public bool IsConnected;
+        public string DataUsage { get; set; }
 
         public void AddCredentials(string username, string password)
         {
@@ -60,7 +63,17 @@ namespace netaccess
             credentials.AddParameter("submit", "", ParameterType.GetOrPost);
             IRestResponse credentialResponse = authClient.Execute(credentials);
             if (credentialResponse.ResponseUri.AbsoluteUri == @"https://netaccess.iitm.ac.in/account/index")
+            {
                 IsAuthValid = true;
+                HtmlDocument html = new HtmlDocument();
+                html.LoadHtml(credentialResponse.Content);
+                string responseContentText = html.DocumentNode.InnerText;
+                Regex regex = new Regex(@"Total download:.+(KB|MB|GB|B)");
+                Match parsedData = regex.Match(responseContentText);
+                string dataUsage = parsedData.Value;
+                dataUsage = dataUsage.Replace("Total download:", "");
+                DataUsage = dataUsage.Trim();
+            }
             if (credentialResponse.ResponseUri.AbsoluteUri == @"https://netaccess.iitm.ac.in/account/login")
             {
                 IsAuthValid = false;

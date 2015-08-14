@@ -14,7 +14,7 @@ namespace netaccess
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class MainWindow
     {
         private LibNetAccess _netAccess;
         private DispatcherTimer _timer;
@@ -73,6 +73,7 @@ namespace netaccess
             if (_netAccess.Authenticate())
             {
                 StatusBlock.Text = "logged in";
+                DataBlock.Text = _netAccess.DataUsage;
                 SystemSounds.Beep.Play();
                 ModernTheme.ApplyTheme(ModernTheme.Theme.Dark, Accent.Green);
                 _telemetry.TrackEvent("AuthenticatedTick");
@@ -98,6 +99,7 @@ namespace netaccess
             {
                 StartButton.IsEnabled = IntervalBox.IsEnabled = ApproveButton.IsEnabled = true;
                 StatusBlock.Text = "logged in";
+                DataBlock.Text = _netAccess.DataUsage;
                 ModernTheme.ApplyTheme(ModernTheme.Theme.Dark, Accent.Green);
                 _telemetry.TrackEvent("Authenticated", new Dictionary<string, string>() { { "roll", "valid" } });
             }
@@ -129,7 +131,7 @@ namespace netaccess
             {
                 MessageBox.Show(exception.Message);
                 _telemetry.TrackException(exception);
-            };
+            }
         }
 
         private void StopButton_OnClick(object sender, RoutedEventArgs e)
@@ -145,6 +147,7 @@ namespace netaccess
             if (_netAccess.Authenticate())
             {
                 StatusBlock.Text = "logged in";
+                DataBlock.Text = _netAccess.DataUsage;
                 SystemSounds.Beep.Play();
                 ModernTheme.ApplyTheme(ModernTheme.Theme.Dark, Accent.Green);
                 _telemetry.TrackEvent("Authenticated");
